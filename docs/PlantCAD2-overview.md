@@ -93,7 +93,8 @@ python src/lora_fine_tune.py tokenize \
     --hf_config "cross_species_acr_train_on_arabidopsis" \
     --hf_split "test_sorghum_bicolor" \
     -output_path "sorghum.parquet" \
-    --model_name "kuleshov-group/PlantCAD2-Small-l24-d0768"
+    --model_name "kuleshov-group/PlantCAD2-Small-l24-d0768" \
+    --sequence_length 600
 ```
 
 #### Prediction

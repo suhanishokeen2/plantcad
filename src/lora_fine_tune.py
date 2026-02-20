@@ -103,6 +103,16 @@ def tokenize(
         dataset = dataset.select(range(min(max_examples, len(dataset))))
         logger.info(f"Limited dataset to {max_examples} examples ({max_batches} batches)")
 
+    # Validate that all sequences match the specified sequence_length
+    logger.info(f"Validating that all sequences are exactly {sequence_length} characters long...")
+    seq_lengths = set(len(str(seq)) for seq in dataset[seq_column])
+    if seq_lengths != {sequence_length}:
+        raise SystemExit(
+            f"ERROR: Not all sequences are {sequence_length} characters long.\n"
+            f"  Found sequence lengths: {sorted(seq_lengths)}\n"
+            f"  Please specify the correct --sequence_length to match your data."
+        )
+
     def _to_label_list(val):
         if isinstance(val, str):
             return [int(c) for c in val]
