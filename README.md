@@ -2,11 +2,12 @@
 ![GitHub Repo stars](https://img.shields.io/github/stars/kuleshov-group/PlantCaduceus)
 ![GitHub Issues or Pull Requests](https://img.shields.io/github/issues/kuleshov-group/PlantCaduceus)
 [![PlantCAD](https://zenodo.org/badge/DOI/10.1073/pnas.2421738122.svg)](https://doi.org/10.1073/pnas.2421738122)
+![PlantCAD Downloads](https://img.shields.io/badge/dynamic/json?color=blue&label=PlantCAD+downloads&query=downloads&url=https://huggingface.co/api/models/kuleshov-group/PlantCaduceus_l32)
 [![PlantCAD2](https://zenodo.org/badge/DOI/10.1101/2025.08.27.672609.svg)](https://doi.org/10.1101/2025.08.27.672609)
-[![Hugging Face](https://img.shields.io/badge/🤗-Hugging%20Face-yellow.svg?style=flat)](https://huggingface.co/collections/kuleshov-group/plantcaduceus-512bp-len-665a229ee098db706a55e44a)
-<a href="https://huggingface.co/collections/kuleshov-group/plantcaduceus-512bp-len-665a229ee098db706a55e44a">
-  <img alt="Hugging Face Downloads" src="https://img.shields.io/badge/dynamic/json?color=blue&label=downloads&query=downloads&url=https://huggingface.co/api/models/kuleshov-group/PlantCaduceus_l32">
-</a>
+![PlantCAD2 Downloads](https://img.shields.io/badge/dynamic/json?color=blue&label=PlantCAD2+downloads&query=downloads&url=https://huggingface.co/api/models/kuleshov-group/PlantCAD2-Small-l24-d0768)
+[![PlantCAD 🤗](https://img.shields.io/badge/🤗-PlantCAD-yellow.svg?style=flat)](https://huggingface.co/collections/kuleshov-group/plantcaduceus-512bp-len-665a229ee098db706a55e44a)
+[![PlantCAD2 🤗](https://img.shields.io/badge/🤗-PlantCAD2-yellow.svg?style=flat)](https://huggingface.co/collections/kuleshov-group/plantcad2-67e437e241a382671371a572)
+
 <p align="center">
   <img src="img/logo.jpg" alt="logo" width="20%">
 </p>
