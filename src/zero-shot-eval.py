@@ -11,6 +11,7 @@ import fire
 import numpy as np
 import pandas as pd
 import torch
+from accelerate import Accelerator
 from datasets import load_dataset
 from sklearn.metrics import roc_curve, auc, average_precision_score
 from torch.utils.data import Dataset, DataLoader
@@ -26,18 +27,19 @@ NUCLEOTIDES_LOWER = tuple(n.lower() for n in NUCLEOTIDES)
 NUCLEOTIDE_TO_INDEX = {b: i for i, b in enumerate(NUCLEOTIDES)}
 
 
-def _require_cuda(device: str) -> str:
-    """Validate that CUDA is available and the requested device is CUDA.
+def _require_cuda() -> None:
+    """Validate that CUDA is available.
 
     This script requires a CUDA-capable GPU. CPU execution is not supported to avoid
     unintended slowdowns or dtype/device mismatches.
     """
-    if not (torch.cuda.is_available() and device.startswith("cuda")):
+    if not torch.cuda.is_available():
         raise RuntimeError(
             "CUDA is required for zero-shot evaluation; CPU is not supported. "
-            "Set -device cuda:0 and ensure a CUDA GPU is available."
+            "Ensure a CUDA GPU is available."
         )
-    return device
+    n = torch.cuda.device_count()
+    logger.info("Using %d GPU(s) for inference.", n)
 
 
 def _optimal_dtype() -> torch.dtype:
@@ -51,14 +53,14 @@ def _optimal_dtype() -> torch.dtype:
     return torch.float32
 
 
-def _load_model(model_name: str, device: str):
+def _load_model(model_name: str):
     dtype = _optimal_dtype()
     logger.warning(
         "Loading model with dtype %s (no auto-fallback). Incompatible weights or kernels may error.",
         dtype,
     )
     model = AutoModelForMaskedLM.from_pretrained(
-        model_name, trust_remote_code=True, torch_dtype=dtype
+        model_name, trust_remote_code=True, torch_dtype=dtype, device_map="auto"
     )
     # Note: We set dtype in two places because some transformers versions are inconsistent in
     # honoring torch_dtype during from_pretrained. See:
@@ -68,7 +70,6 @@ def _load_model(model_name: str, device: str):
     # model.to(dtype)
     model.to(torch.float32)  # temporary due to hardware compatibility issues
     tok = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
-    model.to(device)
     model.eval()
     return model, tok
 
@@ -355,8 +356,10 @@ class ZeroShotEval:
         if logits_path is not None:
             probs = pd.read_csv(logits_path, sep="\t").values
         else:
-            dev = _require_cuda(device)
-            model_, tok = _load_model(model, dev)
+            _require_cuda()
+            accelerator = Accelerator()
+            dev = accelerator.device
+            model_, tok = _load_model(model)
             dataset = SingleMaskDataset(df[seq_column], tok, token_idx)
             loader = DataLoader(dataset, batch_size=batch_size, shuffle=False, num_workers=1)
             probs = _masked_probs(model_, tok, loader, dev, desc=f"Masked logits @ {token_idx}")
@@ -419,8 +422,10 @@ class ZeroShotEval:
         if logits_path is not None:
             probs = pd.read_csv(logits_path, sep="\t").values
         else:
-            dev = _require_cuda(device)
-            model_, tok = _load_model(model, dev)
+            _require_cuda()
+            accelerator = Accelerator()
+            dev = accelerator.device
+            model_, tok = _load_model(model)
             dataset = MultiMaskDataset(df[seq_column], tok, positions)
             loader = DataLoader(dataset, batch_size=batch_size, shuffle=False, num_workers=1)
             probs = _masked_probs(model_, tok, loader, dev, desc=f"Masked logits motif_len={motif_len}")
@@ -473,8 +478,10 @@ class ZeroShotEval:
         if missing:
             raise KeyError(f"Missing required columns: {missing}")
 
-        dev = _require_cuda(device)
-        model_, tok = _load_model(model, dev)
+        _require_cuda()
+        accelerator = Accelerator()
+        dev = accelerator.device
+        model_, tok = _load_model(model)
 
         # Unmasked probabilities
         ref_probs = _unmasked_probs(df["RefSeq"], tok, model_, dev, batch_size, desc="Ref (unmasked)")
@@ -539,8 +546,10 @@ class ZeroShotEval:
         if logits_path is not None:
             probs = pd.read_csv(logits_path, sep="\t").values
         else:
-            dev = _require_cuda(device)
-            model_, tok = _load_model(model, dev)
+            _require_cuda()
+            accelerator = Accelerator()
+            dev = accelerator.device
+            model_, tok = _load_model(model)
             dataset = MultiMaskDataset(df[seq_column], tok, positions)
             loader = DataLoader(dataset, batch_size=batch_size, shuffle=False, num_workers=1)
             probs = _masked_probs(model_, tok, loader, dev, desc=f"Masked logits (core/non-core) motif_len={motif_len}")
