@@ -13,4 +13,6 @@ services:
       - /mnt/data1/shared/plantcad:/mnt/data1/shared/plantcad
     working_dir: /workspace
     command: >
-      sh -c "pip install --no-cache-dir fire"
+      sh -c "pip install --no-cache-dir fire && /bin/bash"
+    tty: true
+    stdin_open: true
