@@ -124,7 +124,8 @@ def load_model_and_tokenizer(model_dir, device):
         # https://github.com/huggingface/transformers/issues/36567
         # Passing torch_dtype here and also calling model.to(dtype) below ensures correctness across
         # versions; when from_pretrained respects torch_dtype, the subsequent .to(dtype) is a no-op.
-        model.to(optimal_dtype)
+        # model.to(optimal_dtype)
+        model.to(torch.float32)  # temporary due to hardware compatibility issues
     except Exception as e:
         logging.error(f"Failed to load model with {optimal_dtype}, falling back to float32. Error: {e}")
         model = AutoModelForMaskedLM.from_pretrained(model_dir, trust_remote_code=True, torch_dtype=torch.float32)

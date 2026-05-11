@@ -65,7 +65,8 @@ def _load_model(model_name: str, device: str):
     # https://github.com/huggingface/transformers/issues/36567
     # Passing torch_dtype here and also calling model.to(dtype) below ensures correctness across
     # versions; when from_pretrained respects torch_dtype, the subsequent .to(dtype) is a no-op.
-    model.to(dtype)
+    # model.to(dtype)
+    model.to(torch.float32)  # temporary due to hardware compatibility issues
     tok = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
     model.to(device)
     model.eval()

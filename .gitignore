@@ -1,3 +1,9 @@
+# Inputs and outputs
+.hf_home
+data
+model
+output
+
 # Ignored by request
 AGENTS.md
 tmp/
